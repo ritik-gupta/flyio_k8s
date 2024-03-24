@@ -17,10 +17,10 @@ module "eks" {
     one = {
       name = "node-group-1"
 
-      instance_types = ["t3.micro"]
+      instance_types = ["r6i.xlarge"]
 
       min_size     = 1
-      max_size     = 10
+      max_size     = 3
       desired_size = 2
     }
   }
