@@ -49,11 +49,6 @@ jobs:
         shell: bash
         run: terraform validate -no-color
 
-      - name: Import cloudfront
-        shell: bash
-        run: |
-          terraform import aws_acm_certificate.this arn:aws:acm:us-east-1:975050058851:certificate/41eec723-bc05-4424-9127-118c0a57039f
-          
       - name: Terraform Plan
         id: plan
         run: |
