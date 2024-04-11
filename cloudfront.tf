@@ -38,6 +38,7 @@ module "cloudfront" {
 ######
 
 resource "aws_acm_certificate" "this" {
+  provider = aws.virginia
   domain_name = "malik.vc"
 }
 
