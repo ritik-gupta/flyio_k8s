@@ -15,7 +15,7 @@ module "cloudfront" {
   origin              = each.value.origin
 
   default_cache_behavior = {
-    target_origin_id       = data.kubernetes_service.nginx_ingress.status.0.load_balancer.0.ingress.0.hostname
+    target_origin_id       = each.key
     viewer_protocol_policy = "allow-all"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
