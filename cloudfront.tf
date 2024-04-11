@@ -25,22 +25,22 @@ module "cloudfront" {
 
   # When you enable additional metrics for a distribution, CloudFront sends up to 8 metrics to CloudWatch in the US East (N. Virginia) Region.
   # This rate is charged only once per month, per metric (up to 8 metrics per distribution).
-  create_monitoring_subscription = true
+#   create_monitoring_subscription = true
 
-  create_origin_access_identity = true
+#   create_origin_access_identity = true
 #   origin_access_identities = {
 #     s3_bucket_one = "My awesome CloudFront can access"
 #   }
 
-  create_origin_access_control = true
-  origin_access_control = {
-    s3_oac = {
-      description      = "CloudFront access to S3"
-      origin_type      = "s3"
-      signing_behavior = "always"
-      signing_protocol = "sigv4"
-    }
-  }
+#   create_origin_access_control = true
+#   origin_access_control = {
+#     s3_oac = {
+#       description      = "CloudFront access to S3"
+#       origin_type      = "s3"
+#       signing_behavior = "always"
+#       signing_protocol = "sigv4"
+#     }
+#   }
 
 #   logging_config = {
 #     bucket = module.log_bucket.s3_bucket_bucket_domain_name
