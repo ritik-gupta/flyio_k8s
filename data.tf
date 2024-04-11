@@ -15,7 +15,7 @@ provider "kubernetes" {
 
 data "kubernetes_service" "nginx_ingress" {
   metadata {
-    name      = helm_release.nginx-ingress-controller.name
+    name = helm_release.nginx-ingress-controller.name
   }
 
   depends_on = [

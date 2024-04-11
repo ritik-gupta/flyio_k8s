@@ -49,11 +49,11 @@ jobs:
         shell: bash
         run: terraform validate -no-color
 
-      # - name: Import cloudfront
-      #   shell: bash
-      #   run: |
-      #     terraform state rm module.cloudfront.aws_cloudfront_distribution.this[0]
-
+      - name: Import cloudfront
+        shell: bash
+        run: |
+          terraform import module.cloudfront.aws_cloudfront_distribution.this[0] "E11D0CC3XHVVTS"
+          
       - name: Terraform Plan
         id: plan
         run: |

@@ -12,5 +12,10 @@ variable "repository_name" {
 
 variable "cloudfront_aliases" {
   description = "Name of the cloudfront aliases"
-  type = list(string)
+  type        = list(string)
+}
+
+variable "origins" {
+  description = "Map of origins for cloudfront"
+  type        = map(any)
 }
