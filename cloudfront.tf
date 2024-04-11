@@ -2,7 +2,8 @@ module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "3.4.0"
 
-  aliases = var.cloudfront_aliases
+  for_each = local.cloudfront_distribution
+  aliases  = each.value.aliases
 
   enabled             = true
   staging             = false # If you want to create a staging distribution, set this to true
@@ -11,24 +12,34 @@ module "cloudfront" {
   price_class         = "PriceClass_All"
   retain_on_delete    = false
   wait_for_deployment = true
+  origin              = each.value.origin
 
-#   origin = var.origins
+  default_cache_behavior = {
+    target_origin_id       = data.kubernetes_service.nginx_ingress.status.0.load_balancer.0.ingress.0.hostname
+    viewer_protocol_policy = "allow-all"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
 
-#   default_cache_behavior = {
-#     target_origin_id       = data.kubernetes_service.nginx_ingress.status.0.load_balancer.0.ingress.0.hostname
-#     viewer_protocol_policy = "allow-all"
-#     allowed_methods        = ["GET", "HEAD"]
-#     cached_methods         = ["GET", "HEAD"]
+    use_forwarded_values = false
+    compress             = true
+    cache_policy_id      = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+  }
 
-#     use_forwarded_values = false
-#     compress             = true
-#     cache_policy_id      = "658327ea-f89d-4fab-a63d-7e88639e58f6"
-#   }
+  viewer_certificate = {
+    acm_certificate_arn            = aws_acm_certificate.this.arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
+    cloudfront_default_certificate = false
+  }
 }
 
-# ######
-# # ACM
-# ######
+######
+# ACM
+######
+
+resource "aws_acm_certificate" "this" {
+  domain_name = "malik.vc"
+}
 
 # # data "aws_route53_zone" "this" {
 # #   name = local.domain_name

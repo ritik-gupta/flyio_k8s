@@ -9,13 +9,3 @@ variable "repository_name" {
   type        = string
   default     = ""
 }
-
-variable "cloudfront_aliases" {
-  description = "Name of the cloudfront aliases"
-  type        = list(string)
-}
-
-variable "origins" {
-  description = "Map of origins for cloudfront"
-  type        = map(any)
-}
