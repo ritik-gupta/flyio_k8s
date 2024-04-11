@@ -2,7 +2,7 @@ module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "3.4.0"
 
-  aliases = ["malik.vc"]
+  aliases = var.cloudfront_aliases
 
   enabled             = true
   staging             = false # If you want to create a staging distribution, set this to true

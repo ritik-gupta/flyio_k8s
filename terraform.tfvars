@@ -1,0 +1,1 @@
+cloudfront_aliases = ["malik.vc"]
