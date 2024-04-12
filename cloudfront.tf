@@ -31,6 +31,8 @@ module "cloudfront" {
     minimum_protocol_version       = "TLSv1.2_2021"
     cloudfront_default_certificate = false
   }
+
+  depends_on = [ helm_release.nginx-ingress-controller ]
 }
 
 ######
