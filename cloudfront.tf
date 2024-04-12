@@ -41,7 +41,7 @@ module "cloudfront" {
 
 resource "aws_acm_certificate" "this" {
   provider          = aws.virginia
-  domain_name       = "malik.vc"
+  domain_name       = "sachin.org.uk"
   validation_method = "DNS"
 }
 

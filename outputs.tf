@@ -11,12 +11,8 @@ output "cluster_name" {
   value       = module.eks.cluster_name
 }
 
-output "cname_name" {
-  value = aws_acm_certificate.this.domain_validation_options.resource_record_name
-}
-
-output "cname_value" {
-  value = aws_acm_certificate.this.domain_validation_options.resource_record_value
+output "acm_certificate_domain_validation_options" {
+  value = aws_acm_certificate.this.domain_validation_options
 }
 
 output "cert_status" {
