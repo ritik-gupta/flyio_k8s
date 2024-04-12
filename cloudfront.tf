@@ -3,7 +3,7 @@ module "cloudfront" {
   version = "3.4.0"
 
   for_each = local.cloudfront_distribution
-  aliases  = try(each.value.aliases, "")
+  aliases  = each.value.aliases
 
   enabled             = true
   staging             = false # If you want to create a staging distribution, set this to true
