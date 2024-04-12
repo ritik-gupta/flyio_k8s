@@ -42,6 +42,7 @@ module "cloudfront" {
 resource "aws_acm_certificate" "this" {
   provider = aws.virginia
   domain_name = "malik.vc"
+  validation_method = "DNS"
 }
 
 # # data "aws_route53_zone" "this" {
