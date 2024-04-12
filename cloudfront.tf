@@ -32,7 +32,7 @@ module "cloudfront" {
   #   cloudfront_default_certificate = false
   # }
 
-  depends_on = [ helm_release.nginx-ingress-controller ]
+  depends_on = [helm_release.nginx-ingress-controller]
 }
 
 ######
@@ -40,8 +40,8 @@ module "cloudfront" {
 ######
 
 resource "aws_acm_certificate" "this" {
-  provider = aws.virginia
-  domain_name = "malik.vc"
+  provider          = aws.virginia
+  domain_name       = "malik.vc"
   validation_method = "DNS"
 }
 
