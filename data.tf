@@ -1,24 +1,24 @@
-provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args = [
-      "eks",
-      "get-token",
-      "--cluster-name",
-      module.eks.cluster_name
-    ]
-  }
-}
+# provider "kubernetes" {
+#   host                   = module.eks.cluster_endpoint
+#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+#   exec {
+#     api_version = "client.authentication.k8s.io/v1beta1"
+#     command     = "aws"
+#     args = [
+#       "eks",
+#       "get-token",
+#       "--cluster-name",
+#       module.eks.cluster_name
+#     ]
+#   }
+# }
 
-data "kubernetes_service" "nginx_ingress" {
-  metadata {
-    name = helm_release.nginx-ingress-controller.name
-  }
+# data "kubernetes_service" "nginx_ingress" {
+#   metadata {
+#     name = helm_release.nginx-ingress-controller.name
+#   }
 
-  depends_on = [
-    helm_release.nginx-ingress-controller
-  ]
-}
+#   depends_on = [
+#     helm_release.nginx-ingress-controller
+#   ]
+# }
