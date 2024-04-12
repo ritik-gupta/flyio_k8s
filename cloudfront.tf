@@ -25,12 +25,12 @@ module "cloudfront" {
     cache_policy_id      = "658327ea-f89d-4fab-a63d-7e88639e58f6"
   }
 
-  viewer_certificate = {
-    acm_certificate_arn            = aws_acm_certificate.this.arn
-    ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
-    cloudfront_default_certificate = false
-  }
+  # viewer_certificate = {
+  #   acm_certificate_arn            = aws_acm_certificate.this.arn
+  #   ssl_support_method             = "sni-only"
+  #   minimum_protocol_version       = "TLSv1.2_2021"
+  #   cloudfront_default_certificate = false
+  # }
 
   depends_on = [ helm_release.nginx-ingress-controller ]
 }
