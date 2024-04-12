@@ -21,7 +21,7 @@ terraform {
   required_version = "~> 1.3"
 }
 
-# provider "aws" {
-#   alias  = "virginia"
-#   region = "us-east-1"
-# }
+provider "aws" {
+  alias  = "virginia"
+  region = "us-east-1"
+}
