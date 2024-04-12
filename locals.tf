@@ -8,7 +8,7 @@ locals {
 
   cloudfront_distribution = {
     ritik = {
-      aliases = ["malik.vc"]
+      # aliases = ["malik.vc"]
       origin = {
         "ritik" = {
           connection_attempts = 3
