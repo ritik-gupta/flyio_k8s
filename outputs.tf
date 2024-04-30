@@ -1,3 +1,3 @@
-output "alb_hostname" {
-  value = aws_alb.main.dns_name
+output "lb_url" {
+  value = "http://${module.alb.lb_dns_name}"
 }

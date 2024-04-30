@@ -1,5 +1,48 @@
-resource "aws_ecs_cluster" "main" {
-  name = "cb-cluster"
+module "ecs" {
+  source  = "terraform-aws-modules/ecs/aws"
+  version = "~> 5.11.1"
+
+  cluster_name = local.example
+
+  # * Allocate 20% capacity to FARGATE and then split
+  # * the remaining 80% capacity 50/50 between FARGATE
+  # * and FARGATE_SPOT.
+  fargate_capacity_providers = {
+    FARGATE = {
+      default_capacity_provider_strategy = {
+        base   = 20
+        weight = 50
+      }
+    }
+    FARGATE_SPOT = {
+      default_capacity_provider_strategy = {
+        weight = 50
+      }
+    }
+  }
+}
+
+data "aws_iam_policy_document" "this" {
+  version = "2012-10-17"
+
+  statement {
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
+
+    principals {
+      identifiers = ["ecs-tasks.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+resource "aws_iam_role" "this" {
+  assume_role_policy = data.aws_iam_policy_document.this.json
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  role       = resource.aws_iam_role.this.name
 }
 
 data "template_file" "cb_app" {
@@ -7,42 +50,43 @@ data "template_file" "cb_app" {
 
   vars = {
     app_image      = "${aws_ecr_repository.repository.repository_url}:latest"
-    app_port       = var.app_port
-    fargate_cpu    = var.fargate_cpu
-    fargate_memory = var.fargate_memory
-    aws_region     = var.aws_region
-    host_port      = var.host_port
+    app_port       = 3000
+    fargate_cpu    = 256
+    fargate_memory = 512
+    aws_region     = "eu-west-2"
+    host_port      = 3000
   }
 }
 
-resource "aws_ecs_task_definition" "app" {
-  family                   = "cb-app-task"
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+resource "aws_ecs_task_definition" "this" {
+  container_definitions    = data.template_file.cb_app.rendered
+  cpu                      = 256
+  execution_role_arn       = resource.aws_iam_role.this.arn
+  family                   = "family-of-${local.example}-tasks"
+  memory                   = 512
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.fargate_cpu
-  memory                   = var.fargate_memory
-  container_definitions    = data.template_file.cb_app.rendered
 }
 
-resource "aws_ecs_service" "main" {
-  name            = "cb-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = var.app_count
+resource "aws_ecs_service" "this" {
+  cluster         = module.ecs.cluster_id
+  desired_count   = 1
   launch_type     = "FARGATE"
+  name            = "${local.example}-service"
+  task_definition = resource.aws_ecs_task_definition.this.arn
 
-  network_configuration {
-    security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = aws_subnet.private.*.id
-    assign_public_ip = true
+  lifecycle {
+    ignore_changes = [desired_count] # Allow external changes to happen without Terraform conflicts, particularly around auto-scaling.
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.app.id
-    container_name   = "cb-app"
-    container_port   = var.app_port
+    container_name   = local.container_name
+    container_port   = local.container_port
+    target_group_arn = module.alb.target_group_arns[0]
   }
 
-  depends_on = [aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs-task-execution-role-policy-attachment]
+  network_configuration {
+    security_groups = [module.vpc.default_security_group_id]
+    subnets         = module.vpc.private_subnets
+  }
 }

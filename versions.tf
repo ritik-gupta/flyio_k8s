@@ -9,7 +9,7 @@ terraform {
 
   backend "s3" {
     bucket         = "tfstatebuckettest"
-    key            = "fargate.tfstate"
+    key            = "fargate_module.tfstate"
     region         = "eu-west-2"
     dynamodb_table = "terraformstatetable"
   }

@@ -1,35 +1,48 @@
-resource "aws_alb" "main" {
-  name            = "cb-load-balancer"
-  subnets         = aws_subnet.public.*.id
-  security_groups = [aws_security_group.lb.id]
-}
+module "alb" {
+  source  = "terraform-aws-modules/alb/aws"
+  version = "~> 9.9.0"
 
-resource "aws_alb_target_group" "app" {
-  name        = "cb-target-group"
-  port        = 3000
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
-  target_type = "ip"
+  load_balancer_type = "application"
+  security_groups    = [module.vpc.default_security_group_id]
+  subnets            = module.vpc.public_subnets
+  vpc_id             = module.vpc.vpc_id
 
-  health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "HTTP"
-    matcher             = "200"
-    timeout             = "3"
-    path                = var.health_check_path
-    unhealthy_threshold = "2"
+  security_group_ingress_rules = {
+    all_http = {
+      type        = "ingress"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "TCP"
+      description = "HTTP web traffic"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
-}
 
-# Redirect all traffic from the ALB to the target group
-resource "aws_alb_listener" "front_end" {
-  load_balancer_arn = aws_alb.main.id
-  port              = var.app_port
-  protocol          = "HTTP"
+  security_group_egress_rules = {
+    all = {
+      type        = "egress"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
 
-  default_action {
-    target_group_arn = aws_alb_target_group.app.id
-    type             = "forward"
+  listeners = {
+    ecs_listener = {
+      # ! Defaults to "forward" action for "target group"
+      # ! at index = 0 in "the target_groups" input below.
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+    }
+  }
+
+  target_groups = {
+    ecs = {
+      backend_port     = local.container_port
+      backend_protocol = "HTTP"
+      target_type      = "ip"
+    }
   }
 }
