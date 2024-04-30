@@ -10,8 +10,8 @@ module "alb" {
 	security_group_rules = {
 		ingress_all_http = {
 			type        = "ingress"
-			from_port   = 80
-			to_port     = 80
+			from_port   = 0
+			to_port     = 0
 			protocol    = "TCP"
 			description = "HTTP web traffic"
 			cidr_blocks = ["0.0.0.0/0"]
