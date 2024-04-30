@@ -21,16 +21,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ARN }}
           role-session-name: ${{ secrets.session_name }}
           aws-region: ${{ vars.region }}
-      
-      # - name: prepare ECR repo name based on the Github repository
-      #   shell: bash
-      #   run: |
-      #     set -eux
-      #     # lowercase the name
-      #     repo="${GITHUB_REPOSITORY,,}"
-
-      #     # replace / with _
-      #     echo "ECR_REPO_NAME=${repo//\//_}" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -49,52 +39,35 @@ jobs:
         shell: bash
         run: terraform validate -no-color
 
+      - name: Create ECR
+        id: ecr
+        shell: bash
+        run: terraform apply -target=aws_ecr_repository.repository
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registries: ${{ secrets.AWS_ACCOUNT_ID }}
+          mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-publish
+        shell: bash
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: "ritik-test-ecr"
+          IMAGE_TAG: "latest"
+        run: |
+          docker build app -f app/Dockerfile -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
       - name: Terraform Plan
         id: plan
         run: |
           terraform plan -out=tf.plan \
             -input=false \
-            -no-color 
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: tf.plan
-          path: tf.plan
-          retention-days: 30
-          if-no-files-found: error
-
-  apply:
-    # if: github.actor != 'dependabot[bot]' && github.ref == 'refs/heads/main' && github.event_name == 'push'
-    name: Terraform Apply
-    runs-on: ubuntu-latest
-    needs: plan
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: ${{ secrets.AWS_ARN }}
-          role-session-name: ${{ secrets.session_name }}
-          aws-region: ${{ vars.region }}
-
-      - name: Download Terraform Plan Artifact
-        uses: actions/download-artifact@v3
-        with:
-         name: tf.plan
-      
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.3
-
-      - name: Terraform Init
-        shell: bash
-        id: init
-        run:
-          terraform init -no-color
+            -no-color
 
       - name: Terraform Apply
         id: apply
