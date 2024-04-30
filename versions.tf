@@ -7,6 +7,13 @@ terraform {
   #     }
   #   }
 
+  backend "s3" {
+    bucket         = "tfstatebuckettest"
+    key            = "fargate.tfstate"
+    region         = "eu-west-2"
+    dynamodb_table = "terraformstatetable"
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
