@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "this" {
   container_definitions    = data.template_file.cb_app.rendered
   cpu                      = 256
   execution_role_arn       = resource.aws_iam_role.this.arn
-  family                   = "family-of-${local.example}-tasks"
+  family                   = "family-of-cb-app-tasks"
   memory                   = 512
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -58,7 +58,7 @@ resource "aws_ecs_service" "this" {
   cluster         = resource.aws_ecs_cluster.this.id
   desired_count   = 1
   launch_type     = "FARGATE"
-  name            = "${local.example}-service"
+  name            = "cb-app-service"
   task_definition = resource.aws_ecs_task_definition.this.arn
 
   lifecycle {

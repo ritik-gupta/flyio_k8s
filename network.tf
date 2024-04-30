@@ -48,9 +48,9 @@ resource "aws_security_group" "ingress_api" {
 
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
-    from_port   = local.container_port
+    from_port   = 0
     protocol    = "TCP"
-    to_port     = local.container_port
+    to_port     = 0
   }
 }
 

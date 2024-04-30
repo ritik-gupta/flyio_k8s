@@ -13,7 +13,7 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "this" {
-  port        = local.container_port
+  port        = 3000
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = resource.aws_vpc.this.id
