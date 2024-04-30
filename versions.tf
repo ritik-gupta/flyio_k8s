@@ -1,11 +1,11 @@
 terraform {
 
-#   cloud {
-#     organization = "supamakers"
-#     workspaces {
-#       name = "saasmaker-$main"
-#     }
-#   }
+  #   cloud {
+  #     organization = "supamakers"
+  #     workspaces {
+  #       name = "saasmaker-$main"
+  #     }
+  #   }
 
   required_providers {
     aws = {
