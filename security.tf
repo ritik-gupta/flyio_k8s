@@ -27,8 +27,8 @@ resource "aws_security_group" "ecs_tasks" {
 
   ingress {
     protocol        = "tcp"
-    from_port       = var.host_port
-    to_port         = var.host_port
+    from_port       = 0
+    to_port         = 0
     security_groups = [aws_security_group.lb.id]
   }
 
