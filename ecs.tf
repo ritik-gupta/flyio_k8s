@@ -80,7 +80,7 @@ resource "aws_ecs_service" "this" {
   }
 
   load_balancer {
-    container_name   = local.container_name
+    container_name   = "cb-app"
     container_port   = local.container_port
     target_group_arn = module.alb.target_group_arns[0]
   }
